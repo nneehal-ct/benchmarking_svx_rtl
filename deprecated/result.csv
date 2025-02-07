@@ -1,0 +1,513 @@
+ground_truth,aisuite_Qwen-2.5-72B-It,aisuite_Claude-3.5-Sonnet,together_Llama-3.3-70B-It
+" 
+ assign enabled = enable; 
+ dmac_data_mover # (.ID_WIDTH(ID_WIDTH),.DATA_WIDTH(S_AXIS_DATA_WIDTH),.BEATS_PER_BURST_WIDTH(BEATS_PER_BURST_WIDTH),.ALLOW_ABORT(1)) i_data_mover (.clk(s_axis_aclk),.resetn(s_axis_aresetn),.xfer_req(s_axis_xfer_req),.request_id(request_id),.response_id(response_id),.eot(eot),.rewind_req_valid(rewind_req_valid),.rewind_req_ready(rewind_req_ready),.rewind_req_data(rewind_req_data),.bl_valid(bl_valid),.bl_ready(bl_ready),.measured_last_burst_length(measured_last_burst_length),.block_descr_to_dst(block_descr_to_dst),.source_id(source_id),.source_eot(source_eot),.req_valid(req_valid),.req_ready(req_ready),.req_last_burst_length(req_last_burst_length),.req_sync_transfer_start(req_sync_transfer_start),.req_xlast(req_xlast),.s_axi_valid(s_axis_valid),.s_axi_ready(s_axis_ready),.s_axi_data(s_axis_data),.s_axi_last(s_axis_last),.s_axi_sync(s_axis_user[0]),.m_axi_valid(fifo_valid),.m_axi_data(fifo_data),.m_axi_last(fifo_last),.m_axi_partial_burst(fifo_partial_burst)); 
+ endmodule","```verilog
+reg [ID_WIDTH-1:0] response_id_reg;
+reg rewind_req_valid_reg;
+reg [ID_WIDTH+3-1:0] rewind_req_data_reg;
+reg bl_valid_reg;
+reg [BEATS_PER_BURST_WIDTH-1:0] measured_last_burst_length_reg;
+reg block_descr_to_dst_reg;
+reg [ID_WIDTH-1:0] source_id_reg;
+reg source_eot_reg;
+reg s_axis_ready_reg;
+reg s_axis_xfer_req_reg;
+reg fifo_valid_reg;
+reg [S_AXIS_DATA_WIDTH-1:0] fifo_data_reg;
+reg fifo_last_reg;
+reg fifo_partial_burst_reg;
+reg req_ready_reg;
+
+assign enabled = enable;
+assign response_id = response_id_reg;
+assign rewind_req_valid = rewind_req_valid_reg;
+assign rewind_req_data = rewind_req_data_reg;
+assign bl_valid = bl_valid_reg;
+assign measured_last_burst_length = measured_last_burst_length_reg;
+assign block_descr_to_dst = block_descr_to_dst_reg;
+assign source_id = source_id_reg;
+assign source_eot = source_eot_reg;
+assign s_axis_ready = s_axis_ready_reg;
+assign s_axis_xfer_req = s_axis_xfer_req_reg;
+assign fifo_valid = fifo_valid_reg;
+assign fifo_data = fifo_data_reg;
+assign fifo_last = fifo_last_reg;
+assign fifo_partial_burst = fifo_partial_burst_reg;
+assign req_ready = req_ready_reg;
+
+always @(posedge s_axis_aclk or negedge s_axis_aresetn) begin
+    if (!s_axis_aresetn) begin
+        response_id_reg <= 0;
+        rewind_req_valid_reg <= 0;
+        rewind_req_data_reg <= 0;
+        bl_valid_reg <= 0;
+        measured_last_burst_length_reg <= 0;
+        block_descr_to_dst_reg <= 0;
+        source_id_reg <= 0;
+        source_eot_reg <= 0;
+        s_axis_ready_reg <= 0;
+        s_axis_xfer_req_reg <= 0;
+        fifo_valid_reg <= 0;
+        fifo_data_reg <= 0;
+        fifo_last_reg <= 0;
+        fifo_partial_burst_reg <= 0;
+        req_ready_reg <= 0;
+    end else if (enable) begin
+        // State machine logic to manage data transfer
+        // Example state machine transitions and assignments
+        if (/* condition for response_id */) begin
+            response_id_reg <= request_id;
+        end
+        if (/* condition for rewind_req_valid */) begin
+            rewind_req_valid_reg <= 1'b1;
+        end else begin
+            rewind_req_valid_reg <= 1'b0;
+        end
+        if (/* condition for rewind_req_data */) begin
+            rewind_req_data_reg <= {request_id, 3'b0};
+        end
+        if (/* condition for bl_valid */) begin
+            bl_valid_reg <= 1'b1;
+        end else begin
+            bl_valid_reg <= 1'b0;
+        end
+        if (/* condition for measured_last_burst_length */) begin
+            measured_last_burst_length_reg <= req_last_burst_length;
+        end
+        if (/* condition for block_descr_to_dst */) begin
+            block_descr_to_dst_reg <= 1'b1;
+        end else begin
+            block_descr_to_dst_reg <= 1'b0;
+        end
+        if (/* condition for source_id */) begin
+            source_id_reg <= request_id;
+        end
+        if (/* condition for source_eot */) begin
+            source_eot_reg <= eot;
+        end
+        if (/* condition for s_axis_ready */) begin
+            s_axis_ready_reg <= 1'b1;
+        end else begin
+            s_axis_ready_reg <= 1'b0;
+        end
+        if (/* condition for s_axis_xfer_req */) begin
+            s_axis_xfer_req_reg <= 1'b1;
+        end else begin
+            s_axis_xfer_req_reg <= 1'b0;
+        end
+        if (/* condition for fifo_valid */) begin
+            fifo_valid_reg <= 1'b1;
+        end else begin
+            fifo_valid_reg <= 1'b0;
+        end
+        if (/* condition for fifo_data */) begin
+            fifo_data_reg <= s_axis_data;
+        end
+        if (/* condition for fifo_last */) begin
+            fifo_last_reg <= s_axis_last;
+        end
+        if (/* condition for fifo_partial_burst */) begin
+            fifo_partial_burst_reg <= 1'b1;
+        end else begin
+            fifo_partial_burst_reg <= 1'b0;
+        end
+        if (/* condition for req_ready */) begin
+            req_ready_reg <= 1'b1;
+        end else begin
+            req_ready_reg <= 1'b0;
+        end
+    end
+end
+
+endmodule
+```","reg [2:0] state;
+reg [ID_WIDTH-1:0] active_id;
+reg enabled_reg;
+reg [BEATS_PER_BURST_WIDTH-1:0] burst_count;
+reg [LENGTH_WIDTH-1:0] transfer_length;
+reg last_burst;
+reg transfer_active;
+
+localparam IDLE = 3'b000;
+localparam ACTIVE = 3'b001;
+localparam WAIT_LAST = 3'b010;
+localparam REWIND = 3'b011;
+
+always @(posedge s_axis_aclk or negedge s_axis_aresetn) begin
+    if (!s_axis_aresetn) begin
+        state <= IDLE;
+        enabled_reg <= 1'b0;
+        active_id <= {ID_WIDTH{1'b0}};
+        burst_count <= {BEATS_PER_BURST_WIDTH{1'b0}};
+        transfer_length <= {LENGTH_WIDTH{1'b0}};
+        last_burst <= 1'b0;
+        transfer_active <= 1'b0;
+    end else begin
+        case (state)
+            IDLE: begin
+                if (enable && req_valid) begin
+                    state <= ACTIVE;
+                    enabled_reg <= 1'b1;
+                    active_id <= request_id;
+                    transfer_length <= req_last_burst_length;
+                    transfer_active <= 1'b1;
+                end
+            end
+            
+            ACTIVE: begin
+                if (s_axis_valid && s_axis_ready) begin
+                    burst_count <= burst_count + 1'b1;
+                    transfer_length <= transfer_length - 1'b1;
+                    
+                    if (burst_count == req_last_burst_length - 1) begin
+                        last_burst <= 1'b1;
+                        state <= WAIT_LAST;
+                    end
+                    
+                    if (s_axis_last || transfer_length == 1) begin
+                        state <= REWIND;
+                    end
+                end
+            end
+            
+            WAIT_LAST: begin
+                if (s_axis_valid && s_axis_ready && s_axis_last) begin
+                    state <= REWIND;
+                end
+            end
+            
+            REWIND: begin
+                if (rewind_req_ready) begin
+                    state <= IDLE;
+                    enabled_reg <= 1'b0;
+                    transfer_active <= 1'b0;
+                    last_burst <= 1'b0;
+                    burst_count <= {BEATS_PER_BURST_WIDTH{1'b0}};
+                end
+            end
+        endcase
+    end
+end
+
+assign enabled = enabled_reg;
+assign response_id = active_id;
+assign rewind_req_valid = (state == REWIND);
+assign rewind_req_data = {active_id, eot, last_burst, 1'b1};
+assign bl_valid = (state == ACTIVE) && last_burst;
+assign measured_last_burst_length = burst_count;
+assign block_descr_to_dst = transfer_active;
+assign source_id = active_id;
+assign source_eot = eot;
+assign s_axis_ready = (state == ACTIVE) || (state == WAIT_LAST);
+assign s_axis_xfer_req = transfer_active;
+assign fifo_valid = s_axis_valid && s_axis_ready;
+assign fifo_data = s_axis_data;
+assign fifo_last = s_axis_last;
+assign fifo_partial_burst = last_burst;
+assign req_ready = (state == IDLE) && enable;
+
+endmodule","reg [ID_WIDTH-1:0] curr_id; 
+reg [LENGTH_WIDTH-1:0] curr_length; 
+reg [BEATS_PER_BURST_WIDTH-1:0] curr_bpb; 
+reg [S_AXIS_DATA_WIDTH-1:0] curr_data; 
+reg [0:0] curr_user; 
+reg curr_last; 
+reg curr_eot; 
+reg [ID_WIDTH+3-1:0] rewind_data; 
+reg req_ready_int; 
+reg [BEATS_PER_BURST_WIDTH-1:0] measured_last_burst_length_int; 
+assign enabled = enable; 
+assign response_id = curr_id; 
+assign rewind_req_valid = (rewind_data != 0); 
+assign rewind_req_data = rewind_data; 
+assign bl_valid = (curr_bpb != 0); 
+assign measured_last_burst_length = measured_last_burst_length_int; 
+assign block_descr_to_dst = curr_eot; 
+assign source_id = curr_id; 
+assign source_eot = curr_eot; 
+assign s_axis_ready = req_valid; 
+assign s_axis_xfer_req = req_sync_transfer_start; 
+assign fifo_valid = s_axis_valid; 
+assign fifo_data = s_axis_data; 
+assign fifo_last = s_axis_last; 
+assign fifo_partial_burst = s_axis_user; 
+assign req_ready = req_ready_int; 
+always @ (posedge s_axis_aclk) 
+begin 
+ if (!s_axis_aresetn) 
+ begin 
+  curr_id <= 0; 
+  curr_length <= 0; 
+  curr_bpb <= 0; 
+  curr_data <= 0; 
+  curr_user <= 0; 
+  curr_last <= 0; 
+  curr_eot <= 0; 
+  rewind_data <= 0; 
+  req_ready_int <= 0; 
+  measured_last_burst_length_int <= 0; 
+ end 
+ else 
+ begin 
+  if (req_valid) 
+  begin 
+   curr_id <= request_id; 
+   curr_length <= req_last_burst_length; 
+   curr_bpb <= req_last_burst_length; 
+   curr_data <= s_axis_data; 
+   curr_user <= s_axis_user; 
+   curr_last <= s_axis_last; 
+   curr_eot <= eot; 
+   rewind_data <= rewind_req_data; 
+   req_ready_int <= req_ready; 
+   measured_last_burst_length_int <= measured_last_burst_length; 
+  end 
+ end 
+end 
+endmodule"
+" 
+ wire or_1, or_2; 
+ wire [W-2:0] zero_comp; 
+ wire zero_reg; 
+ Comparator_Equal #(.S(W-1)) Data_A_Comp (.Data_A(Data_A),.Data_B(zero_comp),.equal_sgn(or_1)); 
+ Comparator_Equal #(.S(W-1)) Data_B_Comp (.Data_A(zero_comp),.Data_B(Data_B),.equal_sgn(or_2)); 
+ RegisterAdd #(.W(1)) Zero_Info_Mult (.clk(clk),.rst(rst),.load(load),.D(zero_reg),.Q(zero_m_flag)); 
+ assign zero_reg = or_1 || or_2; 
+ assign zero_comp = {(W-1){1'd0}}; 
+ endmodule","```verilog
+wire or_1, or_2; 
+wire [W-2:0] zero_comp; 
+wire zero_reg; 
+Comparator_Equal #(.S(W-1)) Data_A_Comp (.Data_A(Data_A),.Data_B(zero_comp),.equal_sgn(or_1)); 
+Comparator_Equal #(.S(W-1)) Data_B_Comp (.Data_A(zero_comp),.Data_B(Data_B),.equal_sgn(or_2)); 
+RegisterAdd #(.W(1)) Zero_Info_Mult (.clk(clk),.rst(rst),.load(load),.D(zero_reg),.Q(zero_m_flag)); 
+assign zero_reg = or_1 || or_2; 
+assign zero_comp = {(W-1){1'd0}}; 
+endmodule
+```","wire or_1, or_2;
+wire [W-2:0] zero_comp;
+wire zero_reg;
+
+Comparator_Equal #(.S(W-1)) Data_A_Comp (
+    .Data_A(Data_A),
+    .Data_B(zero_comp),
+    .equal_sgn(or_1)
+);
+
+Comparator_Equal #(.S(W-1)) Data_B_Comp (
+    .Data_A(zero_comp),
+    .Data_B(Data_B),
+    .equal_sgn(or_2)
+);
+
+RegisterAdd #(.W(1)) Zero_Info_Mult (
+    .clk(clk),
+    .rst(rst),
+    .load(load),
+    .D(zero_reg),
+    .Q(zero_m_flag)
+);
+
+assign zero_reg = or_1 || or_2;
+assign zero_comp = {(W-1){1'b0}};
+
+endmodule","wire or_1, or_2; 
+wire [W-2:0] zero_comp; 
+wire zero_reg; 
+Comparator_Equal #(.S(W-1)) Data_A_Comp (.Data_A(Data_A),.Data_B(zero_comp),.equal_sgn(or_1)); 
+Comparator_Equal #(.S(W-1)) Data_B_Comp (.Data_A(zero_comp),.Data_B(Data_B),.equal_sgn(or_2)); 
+RegisterAdd #(.W(1)) Zero_Info_Mult (.clk(clk),.rst(rst),.load(load),.D(zero_reg),.Q(zero_m_flag)); 
+assign zero_reg = or_1 || or_2; 
+assign zero_comp = {(W-1){1'd0}}; 
+endmodule"
+" 
+ input clk,rst; 
+ input rd_en; 
+ input wr_en; 
+ output full,emptyp; 
+ reg full,emptyp; 
+ reg[4:0]count; 
+ parameter max_count=5'b01111; 
+ always @ (posedge clk or negedge rst) 
+ begin 
+  if(!rst) 
+  count<=0; 
+  else 
+  begin 
+  case({wr_en,rd_en}) 
+  2'b00:count<=count; 
+  2'b01: 
+  if(count!==5'b00000) 
+  count<=count-1; 
+  2'b10: 
+  if(count!== max_count) 
+  count<=count+1; 
+  2'b11:count<=count; 
+  endcase 
+  end 
+ end 
+ always @(count) 
+ begin 
+  if(count==5'b00000) 
+  emptyp<=1; 
+  else 
+  emptyp<=0; 
+ end 
+ always @(count) 
+ begin 
+  if(count== max_count) 
+  full<=1; 
+  else 
+  full<=0; 
+ end 
+ endmodule","```verilog
+reg full, emptyp;
+reg [3:0] count;
+parameter MAX_COUNT = 15;
+
+always @ (posedge clk or negedge rst) begin
+  if (!rst) begin
+    count <= 0;
+    full <= 0;
+    emptyp <= 1;
+  end
+  else begin
+    case ({wr_en, rd_en})
+      2'b00: begin
+        if (count == 0) begin
+          emptyp <= 1;
+        end
+        else begin
+          emptyp <= 0;
+        end
+      end
+      2'b01: begin
+        if (count != 0) begin
+          count <= count - 1;
+          if (count == 0) begin
+            emptyp <= 1;
+          end
+        end
+      end
+      2'b10: begin
+        if (count < MAX_COUNT) begin
+          count <= count + 1;
+          if (count == MAXCOUNT) begin
+            full <= 1;
+          end
+        end
+      end
+      2'b11: begin
+        if (count != 0) begin
+          count <= count - 1;
+          if (count == 0) begin
+            emptyp <= 1;
+          end
+        end
+        else if (count < MAXCOUNT) begin
+          count <= count + 1;
+          if (count == MAXCOUNT) begin
+            full <= 1;
+          end
+        end
+      end
+    endcase
+  end
+end
+
+always @ (posedge clk or negedge rst) begin
+  if (!rst) begin
+    emptyp <= 1;
+  end
+  else begin
+    if (count == 4'b0000) begin
+      emptyp <= 1;
+    end
+    else begin
+      emptyp <= 0;
+    end
+  end
+end
+
+always @ (posedge clk or negedge rst) begin
+  if (!rst) begin
+    full <= 0;
+  end
+  else begin
+    if (count == MAXCOUNT) begin
+      full <= 1;
+    end
+    else begin
+      full <= 0;
+    end
+  end
+end
+
+endmodule
+```","reg full, emptyp;
+reg [3:0] count;
+parameter MAX_COUNT = 4'b1111;
+
+always @(posedge clk or negedge rst) begin
+    if (!rst) begin
+        count <= 4'b0000;
+    end else begin
+        case ({wr_en, rd_en})
+            2'b00: count <= count;
+            2'b01: begin
+                if (count != 4'b0000)
+                    count <= count - 1'b1;
+            end
+            2'b10: begin
+                if (count < MAX_COUNT)
+                    count <= count + 1'b1;
+            end
+            2'b11: count <= count;
+        endcase
+    end
+end
+
+always @(count) begin
+    if (count == 4'b0000)
+        emptyp <= 1'b1;
+    else
+        emptyp <= 1'b0;
+end
+
+always @(count) begin
+    if (count == MAX_COUNT)
+        full <= 1'b1;
+    else
+        full <= 1'b0;
+end
+
+endmodule","reg [3:0] count;
+reg fullp, emptyp;
+always @ (posedge clk, negedge rst)
+begin
+  if (!rst) 
+    begin
+      count <= 4'd0;
+      fullp <= 1'b0;
+      emptyp <= 1'b1;
+    end
+  else
+    begin
+      case ({wr_en, rd_en})
+        2'b00: count <= count;
+        2'b01: count <= (count != 4'd0) ? count - 1'b1 : count;
+        2'b10: count <= (count != 4'd15) ? count + 1'b1 : count;
+        2'b11: count <= count;
+      endcase
+      if (count == 4'd0)
+        emptyp <= 1'b1;
+      else
+        emptyp <= 1'b0;
+      if (count == 4'd15)
+        fullp <= 1'b1;
+      else
+        fullp <= 1'b0;
+    end
+end
+endmodule"
