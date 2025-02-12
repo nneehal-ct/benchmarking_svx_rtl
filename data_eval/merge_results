@@ -1,0 +1,68 @@
+import os
+import pandas as pd
+from pathlib import Path
+
+def find_and_merge_csv_files(base_path, target_filename):
+    """
+    Find and merge CSV files with the same name from different date-named folders.
+    
+    Args:
+        base_path (str): Base directory path to search in
+        target_filename (str): Name of the CSV file to find and merge
+        
+    Returns:
+        pandas.DataFrame: Merged dataframe containing data from all found CSV files
+    """
+    # Convert base_path to Path object for better path handling
+    base_dir = Path(base_path)
+    
+    # List to store all found CSV files
+    csv_files = []
+    
+    # List to store all dataframes
+    dfs = []
+    
+    # Walk through directories and find matching CSV files
+    for folder in base_dir.iterdir():
+        if folder.is_dir() and folder.name[0].isdigit():  # Check if folder name starts with a number
+            csv_path = folder / target_filename
+            if csv_path.exists():
+                print(f"Found CSV in {folder.name}")
+                csv_files.append(csv_path)
+                
+                # Read the CSV and add a column for the source folder
+                df = pd.read_csv(csv_path)
+                df['source_folder'] = folder.name
+                dfs.append(df)
+    
+    if not dfs:
+        raise FileNotFoundError(f"No {target_filename} files found in date-named folders")
+    
+    # Concatenate all dataframes
+    merged_df = pd.concat(dfs, ignore_index=True)
+    
+    return merged_df
+
+def main():
+    # Define paths
+    base_path = "../data/benchmarking_nl_to_rtl/all_models_results"
+    target_file = "final_results_scores.csv"
+    
+    try:
+        # Find and merge CSV files
+        merged_data = find_and_merge_csv_files(base_path, target_file)
+        
+        # Create output directory if it doesn't exist
+        output_dir = Path("merged_results")
+        output_dir.mkdir(exist_ok=True)
+        
+        # Save merged data
+        output_path = output_dir / "merged_final_results_scores.csv"
+        merged_data.to_csv(output_path, index=False)
+        print(f"Successfully merged {len(merged_data)} rows into {output_path}")
+        
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    main()
