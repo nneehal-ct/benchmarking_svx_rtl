@@ -1,0 +1,557 @@
+index,ground_truth,aisuite_Llama-3.1-8B-Instruct,aisuite_Mistral-Nemo-Instruct-2407,aisuite_Mistral-7B
+304," 
+  input rx_clk; 
+  input [ 3:0] rx_ip_sof; 
+  input [31:0] rx_ip_data; 
+  output rx_sof; 
+  output [31:0] rx_data; 
+  reg [31:0] rx_ip_data_d = 'd0; 
+  reg [ 3:0] rx_ip_sof_hold = 'd0; 
+  reg rx_sof = 'd0; 
+  reg [31:0] rx_data = 'd0; 
+  always @(posedge rx_clk) begin 
+  rx_ip_data_d <= rx_ip_data; 
+  if (rx_ip_sof != 4'd0) begin 
+  rx_ip_sof_hold <= rx_ip_sof; 
+  end 
+  rx_sof <= |rx_ip_sof; 
+  if (rx_ip_sof_hold[3] == 1'b1) begin 
+  rx_data[31:24] <= rx_ip_data[ 7: 0]; 
+  rx_data[23:16] <= rx_ip_data[15: 8]; 
+  rx_data[15: 8] <= rx_ip_data[23:16]; 
+  rx_data[ 7: 0] <= rx_ip_data[31:24]; 
+  end else if (rx_ip_sof_hold[2] == 1'b1) begin 
+  rx_data[31:24] <= rx_ip_data[31:24]; 
+  rx_data[23:16] <= rx_ip_data_d[ 7: 0]; 
+  rx_data[15: 8] <= rx_ip_data_d[15: 8]; 
+  rx_data[ 7: 0] <= rx_ip_data_d[23:16]; 
+  end else if (rx_ip_sof_hold[1] == 1'b1) begin 
+  rx_data[31:24] <= rx_ip_data[23:16]; 
+  rx_data[23:16] <= rx_ip_data[31:24]; 
+  rx_data[15: 8] <= rx_ip_data_d[ 7: 0]; 
+  rx_data[ 7: 0] <= rx_ip_data_d[15: 8]; 
+  end else if (rx_ip_sof_hold[0] == 1'b1) begin 
+  rx_data[31:24] <= rx_ip_data[15: 8]; 
+  rx_data[23:16] <= rx_ip_data[23:16]; 
+  rx_data[15: 8] <= rx_ip_data[31:24]; 
+  rx_data[ 7: 0] <= rx_ip_data_d[ 7: 0]; 
+  end else begin 
+  rx_data[31:24] <= 8'd0; 
+  rx_data[23:16] <= 8'd0; 
+  rx_data[15: 8] <= 8'd0; 
+  rx_data[ 7: 0] <= 8'd0; 
+  end 
+  end 
+ endmodule","wire rx_sof,rx_data[31:0]; 
+reg [31:0] rx_ip_data,rx_ip_data_d,rx_ip_sof_hold[3:0],rx_sof,rx_data[31:0]; 
+
+always @(posedge rx_clk) begin 
+  rx_ip_data_d <= rx_ip_data; 
+  if(!rx_ip_sof) begin 
+  rx_ip_sof_hold[3] <= 0; 
+  rx_ip_sof_hold[2] <= 0; 
+  rx_ip_sof_hold[1] <= 0; 
+  rx_ip_sof_hold[0] <= 0; 
+  end 
+  else if(rx_ip_sof_hold[3]) begin 
+  rx_ip_sof_hold[3] <= 0; 
+  end 
+  else if(rx_ip_sof_hold[2]) begin 
+  rx_ip_sof_hold[2] <= 0; 
+  end 
+  else if(rx_ip_sof_hold[1]) begin 
+  rx_ip_sof_hold[1] <= 0; 
+  end 
+  else begin 
+  rx_ip_sof_hold[0] <= rx_ip_sof; 
+  end 
+end 
+assign rx_sof = rx_ip_sof[3]; 
+
+if(rx_ip_sof) begin 
+  rx_data[15:0] = rx_ip_data[15:0]; 
+  if(rx_ip_sof_hold[2]) begin 
+  rx_data[31:16] = 16'd0; 
+  end 
+  end 
+else begin 
+  if(rx_ip_sof_hold[0]) begin 
+  rx_data[31:24] = rx_ip_data[31:24]; 
+  end 
+  else begin 
+  rx_data[31:24] = 8'd0; 
+  end 
+  end 
+if(rx_ip_sof) begin 
+  rx_data[23:16] = rx_ip_data[23:16]; 
+  if(rx_ip_sof_hold[1]) begin 
+  rx_data[31:24] = 8'd0; 
+  end 
+end 
+else begin 
+  if(rx_ip_sof_hold[1]) begin 
+  rx_data[27:24] = rx_ip_data[27:24]; 
+  end 
+  else begin 
+  rx_data[27:24] = 4'd0; 
+  end 
+  end 
+if(rx_ip_sof) begin 
+  rx_data[31:28] = rx_ip_data[31:28]; 
+  if(rx_ip_sof_hold[0]) begin 
+  rx_data[23:16] = 8'd0; 
+  end 
+end 
+else begin 
+  if(rx_ip_sof_hold[0]) begin 
+  rx_data[31:28] = rx_ip_data[31:28]; 
+  end 
+  else begin 
+  rx_data[31:28] = 4'd0; 
+  end 
+  end 
+if(!rx_ip_sof) begin 
+  rx_data[31:0] = 32'd0; 
+end",Here's the Verilog code for the block_7:," reg rx_ip_sof_hold [3:0];
+reg [31:0] rx_ip_data_d, rx_data;
+
+always @(posedge rx_clk) begin
+  if (rx_ip_sof != 0) begin
+    rx_ip_sof_hold <= rx_ip_sof;
+  end
+  rx_ip_data_d <= rx_ip_data;
+end
+
+always @(posedge rx_clk) begin
+  if (rx_ip_sof_hold[3]) begin
+    rx_sof <= 1'b1;
+    rx_data[31:28] <= rx_ip_data_d[31:28];
+    rx_data[27:24] <= rx_ip_data_d[27:24];
+    rx_data[23:20] <= rx_ip_data_d[23:20];
+    rx_data[19:16] <= rx_ip_data_d[19:16];
+    rx_data[15:12] <= rx_ip_data_d[15:12];
+    rx_data[11:8] <= rx_ip_data_d[11:8];
+    rx_data[7:4] <= rx_ip_data_d[7:4];
+    if (rx_ip_sof_hold[2]) begin
+      rx_data[3:0] <= rx_ip_data_d[3:0];
+    end else begin
+      rx_data[3:0] <= 4'b0000;
+    end
+  end else if (rx_ip_sof_hold[2]) begin
+    rx_sof <= 1'b0;
+    rx_data[31:28] <= rx_ip_data_d[31:28];
+    rx_data[27:24] <= rx_ip_data_d[27:24];
+    rx_data[23:20] <= rx_ip_data_d[23:20];
+    rx_data[19:16] <= rx_ip_data_d[19:16];
+    rx_data[15:12] <= rx_ip_data_d[15:12];
+    rx_data[11:8] <= rx_ip_data_d[11:8];
+    rx_data[7:4] <= rx_ip_data_d[7:4];
+    if (rx_ip_sof_hold[1]) begin
+      rx_data[3:0] <= rx_ip_data_d[3:0];
+    end else begin
+      rx_data[3:0] <= 4'b0000;
+    end
+  end else if (rx_ip_sof_hold[1]) begin
+    rx_sof <= 1'b0;
+    rx_data[31:28] <= rx_ip_data_d[31:28];
+    rx_data[27:24] <= rx_ip_data_d[27:24];
+    rx_data[23:20] <= rx_ip_data_d[23:20];
+    rx_data[19:16] <= rx_ip_data_d[19:16];
+    rx_data[15:12] <= rx_ip_data_d[15:12];
+    rx_data[11:8] <= rx_ip_data_d[11:8];
+    rx_data[7:4] <= rx_ip_data_d[7:4];
+    if (rx_ip_sof_hold[0]) begin
+      rx_data[3:0] <= rx_ip_data_d[3:0];
+    end else begin
+      rx_data[3:0] <= 4'b0000;
+      rx_data[7:0] <= 8'b00000000;
+    end
+  end else begin
+    rx_sof <= 1'b0;
+    rx_data <= 32'b0;
+  end
+end
+
+endmodule"
+340," 
+  parameter P = 32; 
+  wire [31:0] float; 
+  wire [7:0] exp; 
+  wire [31:0] IN_BS; 
+  wire [31:0] P_RESULT; 
+  wire [31:0] MUX32; 
+  wire [31:0] MUX32_OUT; 
+  wire [31:0] NORM; 
+  wire [7:0] MUX1; 
+  wire [7:0] MUX2; 
+  wire [7:0] SUBT_1; 
+  wire [7:0] SUBT_2; 
+  assign IN_BS [31:27] = 5'b00000; 
+  assign IN_BS [26] = 1'b1; 
+  assign IN_BS [25:3] = float[22:0]; 
+  assign IN_BS [2:0] = 3'b000; 
+  assign Exp = float[30:23]; 
+ FF_D #(.P(P)) REG_FLOAT (.CLK(CLK),.RST(RST),.EN(EN_REG1),.D(FLOAT),.Q(float)); 
+ Comparador_Mayor EXP127(.CLK(CLK),.A(float[30:23]),.B(8'b01111111),.Out(Exp_out)); 
+ Barrel_Shifter #(.SWR(32),.EWR(8)) S_REG(.clk(CLK),.rst(RST),.load_i(LOAD),.Shift_Value_i(MUX2),.Shift_Data_i(IN_BS),.Left_Right_i(Exp_out),.Bit_Shift_i(1'b0),.N_mant_o(P_RESULT)); 
+ S_SUBT #(.P(8),.W(8)) SUBT_EXP_1 (.A(float[30:23]),.B(8'b01111111),.Y(SUBT_1)); 
+ S_SUBT #(.P(8),.W(8)) SUBT_EXP_2 (.A(8'b01111111),.B(float[30:23]),.Y(SUBT_2)); 
+ Mux_2x1_8Bits MUX2x1_1 (.MS(Exp_out),.D_0(SUBT_2),.D_1(SUBT_1),.D_out(MUX1)); 
+ Mux_2x1_8Bits MUX2x1_2 (.MS(MS_1),.D_0(8'b00000000),.D_1(MUX1),.D_out(MUX2)); 
+ SUBT_32Bits SUBT_RESULT (.A(32'b00000000000000000000000000000000),.B(P_RESULT),.Y(MUX32)); 
+ Mux_2x1 #(.P(P)) MUX2x1_32Bits (.MS(float[31]),.D_0(P_RESULT),.D_1(MUX32),.D_out(MUX32_OUT)); 
+ FF_D #(.P(P)) REG_FIXED (.CLK(CLK),.RST(RST),.EN(EN_REG2),.D(MUX32_OUT),.Q(FIXED)); 
+ endmodule","parameter P = 32;
+ reg [31:0] float, P_RESULT, MUX32, MUX32_OUT;
+ wire [31:0] IN_BS;
+ wire [7:0] exp, SUBT_1, SUBT_2, NORM, MUX2, MUX1;
+ wire [7:0] MUX2aux;
+ reg [7:0] MS_1;
+ reg [7:0] MUX1aux;
+ reg [7:0] MUX2aux_F;
+ reg [7:0] MUX1aux_F;
+ reg [7:0] MUX1aux_FF;
+ reg [7:0] MUX2aux_F;
+ reg [7:0] MUX1aux_FF_reg1;
+ reg [7:0] MUX2aux_F_reg1;
+ reg [7:0] MUX1aux_FF_reg2;
+ reg [7:0] MUX2aux_F_reg2;
+ reg [7:0] MUX1aux_01_r;
+ reg [7:0] MUX2aux_01_r;
+ reg [7:0] MUX1aux_10_r;
+ reg [7:0] MUX2aux_10_r;
+ reg [7:0] MUX1aux_F_11_r;
+ reg [7:0] MUX2_aux;
+ 
+ IN_BS[31:27] = 5'b00000;
+ IN_BS[26] = 1'b1;
+ always @(EN_REG1, RST) begin
+    if(RST)
+      begin
+      reg1_reg <=  0;
+      reg2_reg <=  0;
+      reg3_Inst <=  1'b0;
+      reg4_Inst <=  1'b0;
+      reg1_Inst <=  0;
+      reg2_Inst <=  0;
+      reg3_Inst <=  0;
+      end
+    else
+      begin
+      reg1_reg <=  reg2_reg; 
+      reg2_reg <=  reg3_Inst; 
+      reg3_Inst <=  reg4_Inst;
+      reg4_Inst <=  reg1_Inst;
+      reg1_Inst <=  reg2_Inst;
+      reg2_Inst <=  reg3_Inst;
+      reg3_Inst <=  1'b0;
+      reg4_Inst <=  1'b0;
+      reg1_Inst <= _float[25:3] | ~IN_BS[25:3];
+      reg2_Inst <=  IN_BS[2:0] | 3'b000;
+      reg3_Inst <=  exp[7:0];
+      reg4_Inst <=  Exp;
+      end
+ end
+ 
+ IN_BS[25:3] = reg1_Inst;
+ IN_BS[2:0] = 3'b0;
+ always @(float[31:24]) begin
+    if (~reg2_Up[7:0])
+      begin
+      P_RESULT[31:24] = 7'bx;
+      P_RESULT[23:0] = 23'bx;
+      end
+    else
+      begin
+      P_RESULT[31:24] = reg1 *[0:1];
+      P_RESULT[23:0] = reg2_Up;
+      end
+ end
+ 
+ FLOAT[31:4] = {float[25:3]|float[3:0],{1{reg3_Inst[0]}},{1{reg2_Inst[0]}},{1{reg4_Inst[0]}}};
+ Exp[7:0] = reg3_Inst;
+ assign led[7:4] = {reg6_Inst[3:0],reg6_Inst[3:0],reg6_Inst[3:0],reg6_Inst[3:0]};
+ FF_D FF_D_inst_0 (.CLK (CLK), .RST (RST), .EN_REG1 (EN_REG1), .FLOAT (FLOAT[27:0]) , .REG1 (reg2_Up), .P (P));
+ Comparador_Mayor Comparador_Mayor_inst_0 (.CLK (CLK), .CENTER (reg3_Up), .MAX (8'b00111111) , .P_RESULT (reg4_Up));
+ Barrel_Shifter Barrel_Shifter_inst_0 (.CLK (CLK), .RST (RST), .LOAD (LOAD), .MUX1 (reg2_Up), .IN_BS (IN_BS), .Exp_out (reg3_Up), .P_RESULT (P_RESULT));
+ S_SUBT S_SUBT_inst_0 (.A (reg3_Up), .B (8'b01111111), .C (SUBT_1));
+ S_SUBT S_SUBT_inst_1 (.A (reg4_Up), .B (8'b01111111), .C (SUBT_2));
+ Mux_2x1_8Bits Mux_2x1_8Bits_inst_0 (.S0 (reg5_Up[0]), .S1 (reg5_Up[1]), .A (SUBT_1), .B (SUBT_2), .Y (MUX1));
+ Mux_2x1_8Bits Mux_2x1_8Bits_inst_1 (.S0 (reg5_Up[0]), .S1 (reg5_Up[1]), .A (MS_1), .B (8'b00000000), .Y (MUX2));
+ SUBT_32Bits SUBT_32Bits_inst_0 (.A (32'b0), .B (P_RESULT), .C (MUX32));
+ Mux_2x1 Mux_2x1_inst_0 (.P (P), .A (FLOAT[31]), .B (P_RESULT), .S (reg1_Up), .Y (MUX32_OUT));
+ FF_D FF_D_inst_1 (.CLK (CLK), .RST (RST), .EN_REG2 (LOAD), .MUX32_OUT (MUX32_OUT), .REGB6 (reg7_Up), ._01 (reg8_Up), .P (P));
+ endmodule",," ```verilog
+parameter P = 32;
+
+wire float[P-1:0];
+wire exp[2:0];
+wire IN_BS[32];
+
+wire P_RESULT[P-1:0];
+wire MUX32[P-1:0];
+wire MUX32_OUT[P-1:0];
+wire NORM[P-1:0];
+wire MUX1[7:0];
+wire MUX2[2:0];
+wire SUBT_1[7:0];
+wire SUBT_2[7:0];
+
+assign IN_BS[31:27] = 5'b00000;
+assign IN_BS[26] = 1'b1;
+
+assign float[22:0] = IN_BS[25:3];
+assign float[30:23] = exp[2:0];
+
+FF_D #(P) flip_flop_1 (.CLK(CLK), .RST(RST), .EN_REG1(EN_REG1), .FLOAT(float), .fix(fix));
+Comparador_Mayor #(P) compare (.CLK(CLK), .IN1(float[30:23]), .IN2(8'b01111111), .exp_out(Exp_out));
+
+Barrel_Shifter #(P) shifter_1 (.CLK(CLK), .RST(RST), .LOAD(LOAD), .MUX2(MUX2), .IN_BS(IN_BS),
+                                             .Exp_out(Exp_out), .P_RESULT(P_RESULT));
+S_SUBT #(P) s_subtract_1 (.A(float[30:23]), .B_IN(8'b01111111), .C(MUX2), .Q(SUBT_1));
+S_SUBT #(P) s_subtract_2 (.A(8'b01111111), .B_IN(float[30:23]), .C(MUX2), .Q(SUBT_2));
+Mux_2x1_8Bits #(P) mux2x1_1 (.A(Exp_out), .B(SUBT_2), .C(SUBT_1), .S(MUX1));
+Mux_2x1_8Bits #(P) mux2x1_2 (.A(MS_1), .B(MUX1), .C(MUX2), .S(MUX2));
+
+SUBT_32Bits #(P) subtract_1 (.A(32'b00000000000000000000000000000000), .B(P_RESULT), .C(MUX32));
+Mux_2x1 #(P) mux2x1 (.IN1(float[31]), .IN2(P_RESULT), .C(MUX32_OUT));
+FF_D #(P) flip_flop_2 (.CLK(CLK), .RST(RST), .EN_REG2(EN_REG2), .D(MUX32_OUT), .FIXED(FIXED));
+
+endmodule
+```"
+47," 
+  parameter NMEM = 128; 
+  parameter IM_DATA = ""im_data.txt""; 
+  reg [31:0] mem [0:127]; 
+  initial begin 
+  $readmemh(IM_DATA, mem, 0, NMEM-1); 
+  end 
+  assign data = mem[addr[8:2]][31:0]; 
+ endmodule","reg [7:0] NMEM = 8'd128; 
+string IM_DATA = ""im_data.txt""; 
+reg [31:0] mem [NMEM-1:0]; 
+always @(posedge clk) begin 
+  $readmemh(IM_DATA, mem); 
+  data <= mem[addr]; 
+end",," reg [127:0] mem [0:NMEM-1];         // Initialize memory array with NMEM elements
+parameter NMEM = 128;         // Parameter for the memory size
+param string IM_DATA = ""im_data.txt"";         // Parameter for the memory file name
+
+always @(posedge clk)         // Read data from the memory file and initialize memory array at every clock edge
+begin
+  if(addr[31] == 1'b1) begin         // Check if the address is out of bound
+    $error(""Address out of bound"");         // Error message if address is out of bound
+    end
+  else begin
+    file im_file;         // Open the memory file
+    int index = addr;         // Initialize index with the address
+    int data;         // Initialize data variable
+    int line_num = 0;         // Initialize line number variable
+    always_comb begin         // Read data from the file line by line
+      if(index >= 0 && index < (int)NMEM) begin         // Check if the index is within the memory bounds
+        if(line_num == index) begin         // Check if the current line number matches the index
+          read(im_file, data);         // Read data from the file
+          mem[index] <= data;         // Store data in the memory array
+          if(eof(im_file)) begin         // Check if the end of the file is reached
+            close(im_file);         // Close the file
+            break;         // Exit the always_comb block
+          end
+          line_num++;         // Increment the line number
+      end
+    end
+  end
+end
+
+assign data = mem[addr];         // Assign the output data based on the input address"
+67," 
+  parameter m = 32; 
+  parameter n = 32; 
+  input wire clk; 
+  input wire `REQ req; 
+  input wire `RES res; 
+  input wire [8*16:1] where; 
+  wire [m-1:0] addr; 
+  wire rd_strobe; 
+  wire wr_strobe; 
+  wire [n-1:0] wr_data; 
+  wire [n/8-1:0] wr_byteena; 
+  wire hold; 
+  wire [n-1:0] rd_data; 
+ `ifdef SIMULATE_MAIN 
+  reg `REQ req_ = 0; 
+  reg `RES res_ = 0; 
+  always @(posedge clk) begin 
+  req_ <= req; 
+  res_ <= res; 
+  end 
+  always @(posedge clk) 
+  if (req`R & req`W) 
+  $display(""%5d PIPECHECKER: %s INV #1 violation, no simultaneous rd and wr"", $time, where); 
+  always @(posedge clk) 
+  if (res_`HOLD && req_ != req) begin 
+  $display(""%5d PIPECHECKER: %s INV #2 violation, request changed while hold active"", $time, where); 
+  $display("" OLD: A %x R %d W %d RD %x WD %x"", req_`A, req_`R, req_`W, req_`RD, req_`WD); 
+  $display("" NEW: A %x R %d W %d RD %x WD %x"", req`A, req`R, req`W, req`RD, req`WD); 
+  end 
+  always @(posedge clk) 
+  if (~req`R & ~req`W & res`HOLD) 
+  $display(""%5d PIPECHECKER: %s INV #3 violation, hold asserted without read or write strobe"", $time, where); 
+  always @(posedge clk) 
+  if (~req_`R & |res`RD) 
+  $display(""%5d PIPECHECKER: %s INV #4 violation, data non-zero without a read in last cycle"", $time, where); 
+ `endif 
+ endmodule","`parameter m = 8, n = 16;  
+wire clk;  
+wire req;  
+reg [m-1:0] addr;  
+reg rd_strobe, wr_strobe;  
+reg [n-1:0] wr_data;  
+reg [m-1:0] wr_byteena;  
+reg hold, rd_data;  
+always @(posedge clk)  
+  begin  
+  req_ <= req;  
+  res_ <= res;  
+  end  
+always @(posedge clk)  
+  begin  
+  if (req && wr_strobe) begin 
+    $display(""Violation: INV #1""); 
+  end  
+  end  
+always @(posedge clk)  
+  begin  
+  if (~req && ~wr_strobe && res_hold && req_ != req && req_) begin 
+    $display(""Violation: INV #2""); 
+    $display(""OLDREQ: "", req_); 
+    $display(""NEWREQ: "", req); 
+  end  
+  end  
+always @(posedge clk)  
+  begin  
+  if (~req && ~wr_strobe && res_hold && ~req_R && res_RD) begin 
+    $display(""Violation: INV #3""); 
+  end  
+  end  
+default nicer_sim:   
+    $display(""Violation: INV #4""); 
+  end   
+endmodule","reg [m-1:0] req_, res_;
+always @(posedge clk) begin
+req_ <= req;
+res_ <= res;
+end
+always @(posedge clk) begin
+if (req && wr_strobe) begin
+$display(""INV #1: Simultaneous read and write"");
+end
+end
+always @(posedge clk) begin
+if (res_`HOLD && req_ != req) begin
+$display(""INV #2: Hold asserted while request changes"");
+$display(""Old request: %b, New request: %b"", req_, req);
+end
+end
+always @(posedge clk) begin
+if (!req && wr_strobe && res`HOLD) begin
+$display(""INV #3: Hold asserted without read or write strobe"");
+end
+if (!req_`R && res`RD) begin
+$display(""INV #3: Read strobe asserted without request"");
+end
+end
+$display(""INV #4: Non-zero data without read in last cycle"");
+endmodule"," `reg [m-1:0] addr_reg;
+reg [n-1:0] wr_data_reg;
+reg [m-1:0] rd_data_reg;
+reg wr_byteena_reg;
+reg hold_reg;
+
+always @(posedge clk)
+begin
+if (wr_byteena_reg)
+begin
+addr_reg <= where;
+wr_data_reg <= wr_data;
+end
+end
+
+always @(posedge clk)
+begin
+if (req)
+begin
+addr_reg <= where;
+wr_byteena_reg <= 1'b1;
+end
+if (res && res_HOLD && addr_reg[m-1] != req_)
+begin
+$display(""INV #2: Old req = "", req_, "", New req = "", req);
+end
+if (!req && !wr_data && res_HOLD)
+begin
+$display(""INV #3: hold asserted without read or write"");
+end
+if (!req && res_RD)
+begin
+$display(""INV #4: Non-zero data without read in last cycle"");
+end
+if (rd_data)
+begin
+rd_data_reg <= rd_data;
+end
+end
+
+assign addr = addr_reg;
+assign rd_strobe = req && res && res_RD;
+assign wr_strobe = req && res && wr_byteena_reg;`
+
+endmodule"
+479," 
+  reg clock; 
+  reg reset; 
+  wire enable1, enable2; 
+ clkEnable_gen #(.DES_CLOCK(4000)) uut1(.enable(enable1),.clock(clock),.greset(reset)); 
+ clkEnable_gen uut2(.enable(enable2),.clock(clock),.greset(reset)); 
+  initial begin 
+  clock = 0; 
+  reset = 0; 
+  #100; 
+  end 
+  always #10 clock = ~clock; 
+ endmodule","wire clock, reset; 
+ clkEnable_gen gen_1 (.enable(enable1), .clock(clock)); 
+ clkEnable_gen gen_2 (.clock(4000), .enable(enable2)); 
+ initial 
+ begin 
+  clkEnable_gen gen_3 (.enable(enable2), .clock()); 
+  clock = 0; 
+  reset = 0; 
+  #100; 
+ end 
+ always #10 clock = ~clock; 
+ endmodule","```verilog
+reg [7:0] clock(10);
+reg [23:0] dip_switches;
+assign led = {D,Q,io_seg,io_led};
+always @(clk) if (en) clock = 10;
+else clock = 0;
+endmodule```"," reg clock, reset;
+ clkEnable_gen inst1 (.enable1(clock), . clock(clock));
+ clkEnable_gen inst2 (.clock(clock), . clockInternal(4000), . enable2(enable2));
+ clkEnable_gen inst3 (.clockInternal(4000), . enable2(enable2));
+
+always @(posedge clock) begin
+  reset <= 0;
+  enable2 <= 0;
+end
+
+always #10 begin
+  reset <= 1;
+  enable2 <= 1;
+end
+
+always #100 begin
+  enable2 <= 0;
+end
+
+endmodule"

@@ -1,0 +1,4 @@
+,scaled_score,logical_equivalence,signal_behavior,edge_case_handling,code_modularity,resource_efficiency,timing_pipeline_depth
+aisuite_Llama-3.1-8B-Instruct,0.39154,1.99,1.952,1.642,1.966,2.052,1.944
+aisuite_Mistral-Nemo-Instruct-2407,0.24339999999999998,1.19,1.19,1.07,1.222,1.418,1.256
+aisuite_Mistral-7B,0.41006,2.048,2.018,1.674,2.184,2.272,1.994

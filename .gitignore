@@ -3,5 +3,9 @@
 
 deprecated/
 benchmark/
-data/
+data/benchmarking_nl_to_rtl/deprecated/
+merged_results/
+
+test.ipynb_checkpoints
+
  

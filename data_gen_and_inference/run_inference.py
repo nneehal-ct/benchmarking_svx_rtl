@@ -1,5 +1,5 @@
 import os
-import json
+import yaml
 import pandas as pd
 import numpy as np
 import tiktoken
@@ -19,10 +19,10 @@ load_dotenv()
 
 ENV_VARS = {
     "WANDB_API_KEY": "WANDB_CASPIA_API_KEY",
-    "OPENAI_API_KEY": None,
+    "OPENAI_API_KEY": "OPENAI_CASPIA_API_KEY",
     "GROQ_API_KEY": None,
-    "HF_TOKEN": "HF_CASPIA_API_KEY",
-    "TOGETHER_API_KEY": "TOGETHER_API_KEY",
+    "HF_TOKEN": "HF_API_KEY",
+    "TOGETHER_API_KEY": "TOGETHER_CASPIA_API_KEY",
     "ANTHROPIC_API_KEY": "ANTHROPIC_CASPIA_API_KEY"
 }
 
@@ -37,8 +37,9 @@ class InferencePipeline:
         dataset_name: str,
         metrics_tracker: Optional[MetricsTracker] = None
     ):
+        # Load YAML configuration file
         with open(models_config, 'r') as f:
-            self.models = json.load(f)
+            self.models = yaml.safe_load(f)
         
         self.dataset_name = dataset_name
         self.metrics_tracker = metrics_tracker or MetricsTracker()
@@ -52,7 +53,7 @@ class InferencePipeline:
     
     def _format_messages(self, query: Dict, examples: List[Dict]) -> List[Dict[str, str]]:
         system_template = """You are a helpful assistant. You will be given a query along with two example queries and corresponding answers to follow.
-        Based on that, you will need to provide a solution to the query. Only answer with Verilog code block, do not generate anything else."""
+        Based on that, you will need to provide a solution to the query. Only answer with Verilog code block, do not generate anything else. Do not give any explanation or context."""
         
         examples_text = ""
         for i, (example, code) in enumerate(examples, start=1):
@@ -148,7 +149,7 @@ class InferencePipeline:
         return df_results
     
 if __name__ == "__main__":
-    models_config = "models.json"
+    models_config = "models.yaml"  # Changed from models.json to models.yaml
     dataset_name = "caspia-technologies/benchmarking_rtl_svx_500_examples"
     
     pipeline = InferencePipeline(
@@ -156,5 +157,5 @@ if __name__ == "__main__":
         dataset_name=dataset_name
     )
     
-    results = pipeline.run_inference(after_index=502)
+    results = pipeline.run_inference(after_index=30)
     print(f"Processed {len(results)} examples")

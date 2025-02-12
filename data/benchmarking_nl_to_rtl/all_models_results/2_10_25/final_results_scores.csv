@@ -1,0 +1,5 @@
+,scaled_score,logical_equivalence,signal_behavior,edge_case_handling,code_modularity,resource_efficiency,timing_pipeline_depth
+aisuite_Claude-3.5-Sonnet,0.7134199999999999,3.5,3.544,3.35,3.556,3.866,3.772
+together_Llama-3.3-70B-It,0.5952000000000001,2.942,2.94,2.66,2.99,3.232,3.104
+together_Mistral-Small-3-24B-It,0.58462,2.884,2.902,2.604,2.916,3.198,3.074
+together_Gemma-2-9B-It,0.5175,2.532,2.532,2.238,2.738,2.906,2.676
